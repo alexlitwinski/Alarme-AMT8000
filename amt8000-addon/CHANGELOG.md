@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.0.7] - 2026-05-25
+
+### Adicionado
+- Logs verbosos de diagnóstico para o fluxo de conexão TCP do socket, comandos de autenticação em formato hexadecimal e loop de recebimento e fragmentação de pacotes iSEC2 para identificar timeouts.
+
 ## [1.0.6] - 2026-05-25
 
 ### Corrigido

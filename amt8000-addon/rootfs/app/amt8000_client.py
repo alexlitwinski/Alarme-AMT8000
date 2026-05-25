@@ -215,35 +215,58 @@ class AMT8000Client:
 
     def _read_data(self):
         """Read data from socket, handling fragmented TCP packets."""
-        header = self._socket.recv(6)
+        logger.info("[Socket] Tentando ler cabecalho de 6 bytes...")
+        try:
+            header = self._socket.recv(6)
+        except Exception as e:
+            logger.error(f"[Socket] Erro ao ler cabecalho: {e}")
+            raise
+
+        logger.info(f"[Socket] Cabecalho lido ({len(header)} bytes): {header.hex().upper()}")
         if len(header) < 6:
-            raise CommunicationError("Failed to read message header.")
+            raise CommunicationError(f"Failed to read message header. Read only {len(header)} bytes.")
 
         expected_len = struct.unpack("!H", header[4:6])[0]
         total_len = 8 + expected_len
+        logger.info(f"[Socket] Tamanho do payload esperado: {expected_len} bytes. Total do pacote: {total_len} bytes.")
 
         buffer = bytearray(header)
 
         bytes_to_read = total_len - len(buffer)
+        logger.info(f"[Socket] Faltam ler {bytes_to_read} bytes do pacote...")
         while bytes_to_read > 0:
-            packet = self._socket.recv(bytes_to_read)
+            logger.info(f"[Socket] Lendo chunk de ate {bytes_to_read} bytes...")
+            try:
+                packet = self._socket.recv(bytes_to_read)
+            except Exception as e:
+                logger.error(f"[Socket] Erro ao ler chunk restante: {e}")
+                raise
+
             if not packet:
+                logger.error("[Socket] Conexao quebrada antes de receber todo o pacote.")
                 raise CommunicationError("Connection broken while receiving data.")
+            logger.info(f"[Socket] Chunk lido ({len(packet)} bytes): {packet.hex().upper()}")
             buffer.extend(packet)
             bytes_to_read -= len(packet)
 
+        logger.info(f"[Socket] Pacote completo recebido ({len(buffer)} bytes): {buffer.hex().upper()}")
         return buffer
 
     def _connect(self):
         """Create a new socket connection."""
         if self._socket is not None:
+            logger.info("[Socket] Socket existente encontrado. Fechando antes de conectar novamente...")
             self._close()
 
+        logger.info(f"[Socket] Iniciando conexao TCP com {self.host}:{self.port}...")
         try:
             self._socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             self._socket.settimeout(TIMEOUT)
+            logger.info(f"[Socket] Timeout configurado para {TIMEOUT}s. Conectando...")
             self._socket.connect((self.host, self.port))
+            logger.info(f"[Socket] Conexao TCP estabelecida com sucesso com {self.host}:{self.port}!")
         except Exception as e:
+            logger.error(f"[Socket] Falha na conexao TCP: {e}")
             self._close()
             raise CommunicationError(f"Failed to connect to {self.host}:{self.port} - {e}")
 
@@ -251,6 +274,7 @@ class AMT8000Client:
         """Close socket connection."""
         if self._socket is None:
             return
+        logger.info("[Socket] Fechando socket...")
         try:
             self._socket.settimeout(0.1)
         except Exception:
@@ -265,13 +289,16 @@ class AMT8000Client:
             pass
         finally:
             self._socket = None
+            logger.info("[Socket] Socket fechado com sucesso.")
 
     def _auth(self):
         """Authenticate with the alarm panel."""
+        logger.info("[Auth] Iniciando processo de autenticacao...")
         if self._socket is None:
             raise CommunicationError("Client not connected.")
 
         pass_array = []
+        logger.info(f"[Auth] Validando formato da senha de {len(self.password)} caracteres...")
         for char in self.password:
             if len(self.password) != 6 or not char.isdigit():
                 raise CommunicationError(
@@ -292,13 +319,41 @@ class AMT8000Client:
 
         cs = calculate_checksum(data)
         payload = bytes(data + [cs])
-        self._socket.send(payload)
+        
+        logger.info(f"[Auth] Enviando pacote de autenticacao ({len(payload)} bytes): {payload.hex().upper()}")
+        try:
+            self._socket.send(payload)
+            logger.info("[Auth] Pacote de autenticacao enviado com sucesso. Aguardando resposta do painel...")
+        except Exception as e:
+            logger.error(f"[Auth] Erro ao enviar pacote de autenticacao: {e}")
+            raise
 
-        return_data = self._read_data()
+        try:
+            return_data = self._read_data()
+        except Exception as e:
+            logger.error(f"[Auth] Falha ao ler resposta de autenticacao: {e}")
+            raise
+
+        if len(return_data) < 9:
+            logger.error(f"[Auth] Resposta de autenticacao muito curta ({len(return_data)} bytes). Esperado >= 9.")
+            raise CommunicationError("Authentication response too short.")
+
         result = return_data[8:9][0]
+        logger.info(f"[Auth] Resposta de autenticacao recebida. Byte de resultado: {result}")
 
         if result == 0:
+            logger.info("[Auth] Autenticacao bem-sucedida! Painel aceitou a conexao.")
             return True
+
+        errors = {
+            1: "Invalid password",
+            2: "Incorrect software version",
+            3: "Alarm panel will call back",
+            4: "Waiting for user permission"
+        }
+        err_msg = errors.get(result, f"Unknown authentication response (code {result})")
+        logger.error(f"[Auth] Falha na autenticacao: {err_msg}")
+
         if result == 1:
             raise AuthError("Invalid password")
         if result == 2:
@@ -307,7 +362,7 @@ class AMT8000Client:
             raise AuthError("Alarm panel will call back")
         if result == 4:
             raise AuthError("Waiting for user permission")
-        raise CommunicationError("Unknown authentication response")
+        raise CommunicationError(err_msg)
 
     def _execute_with_connection(self, func):
         """Execute a function with a fresh connection, using thread locking."""
@@ -329,8 +384,15 @@ class AMT8000Client:
             status_data = DST_ID + OUR_ID + length + COMMANDS["status"]
             cs = calculate_checksum(status_data)
             payload = bytes(status_data + [cs])
-            self._socket.send(payload)
+            logger.info(f"[Status] Enviando pacote de requisicao de status ({len(payload)} bytes): {payload.hex().upper()}")
+            try:
+                self._socket.send(payload)
+                logger.info("[Status] Requisicao de status enviada. Aguardando dados...")
+            except Exception as e:
+                logger.error(f"[Status] Erro ao enviar requisicao de status: {e}")
+                raise
             return_data = self._read_data()
+            logger.info(f"[Status] Resposta recebida ({len(return_data)} bytes). Fazendo parsing dos dados...")
             return build_status(return_data)
 
         return self._execute_with_connection(_status)
