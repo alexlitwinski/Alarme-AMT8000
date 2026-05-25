@@ -2,7 +2,7 @@
 # https://github.com/your-repo/amt8000-addon
 
 name: "AMT-8000 Alarm Manager"
-version: "1.0.4"
+version: "1.0.5"
 slug: "amt8000_alarm_manager"
 description: "Gerencie sua central de alarme Intelbras AMT-8000 com uma interface moderna e intuitiva. Monitore zonas, partições, bateria e muito mais."
 url: "https://github.com/your-repo/amt8000-addon"
@@ -14,7 +14,7 @@ arch:
 
 # Ingress configuration - embeds Web UI in Home Assistant sidebar
 ingress: true
-ingress_port: 8099
+ingress_port: 8199
 panel_icon: "mdi:shield-home"
 panel_title: "AMT-8000"
 

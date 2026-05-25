@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.0.5] - 2026-05-25
+
+### Corrigido
+- Alteração da porta do Ingress e do servidor Flask de `8099` para `8199` para resolver conflito de endereço já em uso ("Address in use") ao rodar no modo de rede do host.
+
 ## [1.0.4] - 2026-05-25
 
 ### Corrigido
