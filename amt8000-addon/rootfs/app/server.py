@@ -20,16 +20,34 @@ logging.basicConfig(
 logger = logging.getLogger("amt8000-server")
 
 # Configuration from environment variables (set by run.sh via bashio)
-AMT_HOST = os.environ.get("AMT_HOST", "192.168.1.100")
-AMT_PORT = int(os.environ.get("AMT_PORT", "9009"))
-AMT_PASSWORD = os.environ.get("AMT_PASSWORD", "123456")
-UPDATE_INTERVAL = int(os.environ.get("AMT_UPDATE_INTERVAL", "4"))
+# Try loading from options.json (HA Add-on path)
+OPTIONS_PATH = "/data/options.json"
+options = {}
+if os.path.exists(OPTIONS_PATH):
+    try:
+        with open(OPTIONS_PATH, "r") as f:
+            options = json.load(f)
+        logger.info("Successfully loaded configuration options from Home Assistant")
+    except Exception as e:
+        logger.error(f"Error loading options.json: {e}")
+
+AMT_HOST = options.get("host") or os.environ.get("AMT_HOST", "192.168.1.100")
+AMT_PORT = int(options.get("port") or os.environ.get("AMT_PORT", "9009"))
+AMT_PASSWORD = options.get("password") or os.environ.get("AMT_PASSWORD", "123456")
+UPDATE_INTERVAL = int(options.get("update_interval") or os.environ.get("AMT_UPDATE_INTERVAL", "4"))
 INGRESS_PATH = os.environ.get("INGRESS_PATH", "")
+
+# Custom names maps (allow flexible custom naming for zones and partitions)
+CUSTOM_ZONES = {int(z["number"]): z["name"] for z in options.get("zones", []) if "number" in z and "name" in z}
+CUSTOM_PARTITIONS = {int(p["number"]): p["name"] for p in options.get("partitions", []) if "number" in p and "name" in p}
+
+logger.info(f"Custom Zone Names Configured: {len(CUSTOM_ZONES)}")
+logger.info(f"Custom Partition Names Configured: {len(CUSTOM_PARTITIONS)}")
 
 # Create Flask app
 app = Flask(__name__, static_folder="static", template_folder="templates")
 
-VERSION = "1.2.3"
+VERSION = "1.3.0"
 
 # Create AMT-8000 client
 client = AMT8000Client(AMT_HOST, AMT_PORT, AMT_PASSWORD)
@@ -115,16 +133,22 @@ def api_status():
                 "connected": False,
             }), 503
 
-        # Convert zone/partition keys to strings for JSON
+        # Convert zone/partition keys to strings for JSON and apply custom names
         data = status_cache["data"]
         if data:
             response_data = dict(data)
-            response_data["zones"] = {
-                str(k): v for k, v in data.get("zones", {}).items()
-            }
-            response_data["partitions"] = {
-                str(k): v for k, v in data.get("partitions", {}).items()
-            }
+            
+            response_data["zones"] = {}
+            for k, v in data.get("zones", {}).items():
+                zone_dict = dict(v)
+                zone_dict["name"] = CUSTOM_ZONES.get(int(k), f"Zona {int(k):02d}")
+                response_data["zones"][str(k)] = zone_dict
+                
+            response_data["partitions"] = {}
+            for k, v in data.get("partitions", {}).items():
+                part_dict = dict(v)
+                part_dict["name"] = CUSTOM_PARTITIONS.get(int(k), f"Partição {int(k):02d}")
+                response_data["partitions"][str(k)] = part_dict
         else:
             response_data = None
 

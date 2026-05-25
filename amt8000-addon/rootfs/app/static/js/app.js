@@ -289,7 +289,7 @@ function renderPartitions(partitions) {
         return `
             <div class="partition-card" id="partition-${p.number}">
                 <div class="partition-header">
-                    <span class="partition-name">Partição ${p.number.toString().padStart(2, '0')}</span>
+                    <span class="partition-name">${p.name || 'Partição ' + p.number.toString().padStart(2, '0')}</span>
                     <span class="partition-status-indicator ${statusIndicatorClass}"></span>
                 </div>
                 
@@ -324,7 +324,7 @@ function renderZones(zones) {
     const filtered = zones.filter(z => {
         // Filter by Query
         const matchSearch = z.number.toString().includes(state.searchQuery) || 
-                            `zona ${z.number}`.includes(state.searchQuery.toLowerCase());
+                            (z.name || `zona ${z.number}`).toLowerCase().includes(state.searchQuery.toLowerCase());
         
         if (!matchSearch) return false;
 
@@ -358,7 +358,7 @@ function renderZones(zones) {
                 <div class="zone-number">${z.number.toString().padStart(2, '0')}</div>
                 
                 <div class="zone-info">
-                    <div class="zone-name">Zona ${z.number.toString().padStart(2, '0')}</div>
+                    <div class="zone-name">${z.name || 'Zona ' + z.number.toString().padStart(2, '0')}</div>
                     
                     <div class="zone-telemetry">
                         <span class="zone-telemetry-item" title="${z.tamper ? 'Problema de Sinal ou Sensor Violado/Tamper' : 'Sinal sem fio OK'}">

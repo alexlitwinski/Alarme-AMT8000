@@ -2,7 +2,7 @@
 # https://github.com/your-repo/amt8000-addon
 
 name: "AMT-8000 Alarm Manager"
-version: "1.2.3"
+version: "1.3.0"
 slug: "amt8000_alarm_manager"
 description: "Gerencie sua central de alarme Intelbras AMT-8000 com uma interface moderna e intuitiva. Monitore zonas, partições, bateria e muito mais."
 url: "https://github.com/your-repo/amt8000-addon"
@@ -24,12 +24,20 @@ options:
   port: 9009
   password: ""
   update_interval: 4
+  zones: []
+  partitions: []
 
 schema:
   host: str
   port: port
   password: password
   update_interval: "int(1,300)"
+  zones?:
+    - number: int
+      name: str
+  partitions?:
+    - number: int
+      name: str
 
 # Startup configuration
 startup: "application"

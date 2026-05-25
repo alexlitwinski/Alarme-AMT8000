@@ -1,5 +1,15 @@
 # Changelog
 
+## [1.3.0] - 2026-05-25
+
+### Adicionado
+- Recurso de **Nomes Personalizados de Zonas e Partições**:
+  - Adicionado suporte no `config.yaml` e no formulário de configurações do Home Assistant para configurar listas opcionais de zonas e partições com nomes personalizados (ex: `número: 6, nome: Sala de Estar`).
+  - Atualização do `server.py` para ler automaticamente o arquivo de opções `/data/options.json` fornecido pelo Home Assistant e aplicar o mapeamento de nomes de forma dinâmica nas respostas da API REST `/api/status`.
+  - Atualização do `app.js` no frontend para exibir os nomes customizados de zonas e partições nas respectivas cartas do dashboard (mantendo fallback automático para os nomes de fábrica "Zona XX" e "Partição XX").
+  - Aprimoramento da ferramenta de pesquisa de zonas na interface web: agora a busca filtra zonas tanto por número quanto pelos seus nomes customizados (ex: pesquisar "Sala" trará as zonas personalizadas correspondentes).
+  - Adicionadas traduções completas de descrição e rotulagem para a interface de configuração em Português (`pt.yaml`) e Inglês (`en.yaml`).
+
 ## [1.2.3] - 2026-05-25
 
 ### Melhorado

@@ -11,3 +11,9 @@ configuration:
   update_interval:
     name: "Intervalo de Atualização (segundos)"
     description: "Frequência de consulta de status da central de alarme pelo addon (padrão: 4 segundos)."
+  zones:
+    name: "Nomes Personalizados de Zonas"
+    description: "Lista de zonas com seus respectivos nomes customizados para exibição (ex: número: 6, nome: Sala de Estar)."
+  partitions:
+    name: "Nomes Personalizados de Partições"
+    description: "Lista de partições com seus respectivos nomes customizados para exibição (ex: número: 1, nome: Casa Principal)."

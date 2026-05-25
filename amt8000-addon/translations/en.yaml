@@ -11,3 +11,9 @@ configuration:
   update_interval:
     name: "Update Interval (seconds)"
     description: "How often the addon requests status updates from the alarm panel (default: 4 seconds)."
+  zones:
+    name: "Custom Zone Names"
+    description: "List of zones with custom names for display in the dashboard (e.g. number: 6, name: Living Room)."
+  partitions:
+    name: "Custom Partition Names"
+    description: "List of partitions with custom names for display in the dashboard (e.g. number: 1, name: Main House)."
