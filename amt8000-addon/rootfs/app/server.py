@@ -8,7 +8,7 @@ import json
 import time
 import logging
 import threading
-from flask import Flask, render_template, jsonify, request
+from flask import Flask, render_template, jsonify, request, make_response
 
 from amt8000_client import AMT8000Client, CommunicationError, AuthError
 
@@ -47,7 +47,7 @@ logger.info(f"Custom Partition Names Configured: {len(CUSTOM_PARTITIONS)}")
 # Create Flask app
 app = Flask(__name__, static_folder="static", template_folder="templates")
 
-VERSION = "1.3.1"
+VERSION = "1.3.2"
 
 # Create AMT-8000 client
 client = AMT8000Client(AMT_HOST, AMT_PORT, AMT_PASSWORD)
@@ -115,7 +115,11 @@ def update_status_cache():
 @app.route("/")
 def index():
     """Serve the main dashboard page."""
-    return render_template("index.html", ingress_path=INGRESS_PATH, version=VERSION)
+    response = make_response(render_template("index.html", ingress_path=INGRESS_PATH, version=VERSION))
+    response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0"
+    response.headers["Pragma"] = "no-cache"
+    response.headers["Expires"] = "0"
+    return response
 
 
 # ============================================================================

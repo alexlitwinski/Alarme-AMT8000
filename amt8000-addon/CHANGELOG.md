@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.3.2] - 2026-05-25
+
+### Corrigido
+- Inclusão de cabeçalhos HTTP estritos de expiração e controle de cache (`Cache-Control: no-store, no-cache, must-revalidate`, `Pragma: no-cache`, `Expires: 0`) especificamente no retorno da rota principal `/` que renderiza o arquivo `index.html`. Isso força o Service Worker e os navegadores integrados ao Home Assistant Ingress a recarregarem sempre a página HTML original atualizada contendo os parâmetros de cache-busting `?v=1.3.2` nos scripts e layouts, em vez de continuarem exibindo a versão antiga de layout armazenada no cache persistente offline do aplicativo.
+
 ## [1.3.1] - 2026-05-25
 
 ### Corrigido
