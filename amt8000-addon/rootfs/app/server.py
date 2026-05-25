@@ -29,6 +29,8 @@ INGRESS_PATH = os.environ.get("INGRESS_PATH", "")
 # Create Flask app
 app = Flask(__name__, static_folder="static", template_folder="templates")
 
+VERSION = "1.2.1"
+
 # Create AMT-8000 client
 client = AMT8000Client(AMT_HOST, AMT_PORT, AMT_PASSWORD)
 
@@ -95,7 +97,7 @@ def update_status_cache():
 @app.route("/")
 def index():
     """Serve the main dashboard page."""
-    return render_template("index.html", ingress_path=INGRESS_PATH)
+    return render_template("index.html", ingress_path=INGRESS_PATH, version=VERSION)
 
 
 # ============================================================================

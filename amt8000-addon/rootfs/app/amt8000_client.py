@@ -22,7 +22,7 @@ COMMANDS = {
     "status": [0x0B, 0x4A],
     "arm_disarm": [0x40, 0x1E],
     "panic": [0x40, 0x1A],
-    "bypass": [0x40, 0x1C],
+    "bypass": [0x40, 0x1F],
 }
 
 
@@ -471,7 +471,7 @@ class AMT8000Client:
 
         def _bypass():
             length = [0x00, 0x04]
-            bypass_data = DST_ID + OUR_ID + length + COMMANDS["bypass"] + [zone_number, 0x01]
+            bypass_data = DST_ID + OUR_ID + length + COMMANDS["bypass"] + [zone_number - 1, 0x01]
             cs = calculate_checksum(bypass_data)
             payload = bytes(bypass_data + [cs])
             logger.info(f"[Bypass] Enviando pacote de bypass ({len(payload)} bytes): {payload.hex().upper()}")
@@ -488,6 +488,10 @@ class AMT8000Client:
             res_byte = return_data[8] if len(return_data) > 8 else None
             logger.info(f"[Bypass] Analisando bytes de resposta - Byte 7 (CMD): {hex(cmd_byte) if cmd_byte is not None else 'N/A'}, Byte 8 (RES): {hex(res_byte) if res_byte is not None else 'N/A'}")
             
+            if cmd_byte == 0xFD:
+                logger.warning(f"[Bypass] Central rejeitou o comando de bypass para a zona {zone_number} (NAK).")
+                return {"success": False, "result": "not_bypassed", "error": "Command rejected by alarm panel (NAK)"}
+
             if res_byte == 0xFE or res_byte == 0x91 or cmd_byte == 0xFE:
                 logger.info(f"[Bypass] Zona {zone_number} anulada com sucesso!")
                 return {"success": True, "result": "bypassed"}
@@ -503,7 +507,7 @@ class AMT8000Client:
 
         def _unbypass():
             length = [0x00, 0x04]
-            bypass_data = DST_ID + OUR_ID + length + COMMANDS["bypass"] + [zone_number, 0x00]
+            bypass_data = DST_ID + OUR_ID + length + COMMANDS["bypass"] + [zone_number - 1, 0x00]
             cs = calculate_checksum(bypass_data)
             payload = bytes(bypass_data + [cs])
             logger.info(f"[Unbypass] Enviando pacote de unbypass ({len(payload)} bytes): {payload.hex().upper()}")
@@ -520,6 +524,10 @@ class AMT8000Client:
             res_byte = return_data[8] if len(return_data) > 8 else None
             logger.info(f"[Unbypass] Analisando bytes de resposta - Byte 7 (CMD): {hex(cmd_byte) if cmd_byte is not None else 'N/A'}, Byte 8 (RES): {hex(res_byte) if res_byte is not None else 'N/A'}")
             
+            if cmd_byte == 0xFD:
+                logger.warning(f"[Unbypass] Central rejeitou o comando de unbypass para a zona {zone_number} (NAK).")
+                return {"success": False, "result": "not_unbypass", "error": "Command rejected by alarm panel (NAK)"}
+
             if res_byte == 0xFE or res_byte == 0x91 or cmd_byte == 0xFE:
                 logger.info(f"[Unbypass] Bypass da zona {zone_number} removido com sucesso!")
                 return {"success": True, "result": "unbypass"}

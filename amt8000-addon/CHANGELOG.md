@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.2.1] - 2026-05-25
+
+### Corrigido
+- Correção do comando de Bypass (anulação) e Unbypass (reativação) de zonas, mudando o código do comando do incorreto `401C` para o código oficial da central `401F` (`COMMANDS["bypass"] = [0x40, 0x1F]`).
+- Ajuste no índice das zonas nos comandos de Bypass/Unbypass para formato 0-indexed (`zone_number - 1`), alinhando com a especificação da central AMT-8000 e resolvendo a rejeição silenciosa de comandos.
+- Implementação de tratamento explícito de pacotes de rejeição NAK (`0xFD`) da central de alarme para reportar falhas de comandos corretamente de forma síncrona.
+- Introdução de parâmetros dinâmicos de cache-busting (`?v={{ version }}`) nos links de folhas de estilo CSS e scripts JS, garantindo que o Home Assistant Ingress atualize a interface web imediatamente após atualizações do add-on, resolvendo problemas onde a telemetria não aparecia na tela por cache antigo do navegador.
+
 ## [1.2.0] - 2026-05-25
 
 ### Adicionado
