@@ -403,6 +403,7 @@ class AMT8000Client:
 
     def arm_partition(self, partition):
         """Arm a specific partition (1-16). Use 0 for all partitions."""
+        logger.info(f"[Arm] Iniciando comando para armar particao {partition}...")
 
         def _arm():
             p = 0xFF if partition == 0 else partition
@@ -410,16 +411,31 @@ class AMT8000Client:
             arm_data = DST_ID + OUR_ID + length + COMMANDS["arm_disarm"] + [p, 0x01]
             cs = calculate_checksum(arm_data)
             payload = bytes(arm_data + [cs])
-            self._socket.send(payload)
+            logger.info(f"[Arm] Enviando pacote de armar ({len(payload)} bytes): {payload.hex().upper()}")
+            try:
+                self._socket.send(payload)
+                logger.info("[Arm] Pacote enviado. Aguardando resposta...")
+            except Exception as e:
+                logger.error(f"[Arm] Erro ao enviar pacote: {e}")
+                raise
             return_data = self._read_data()
-            if return_data[8] == 0x91:
+            logger.info(f"[Arm] Resposta recebida ({len(return_data)} bytes): {return_data.hex().upper()}")
+            
+            res_byte = return_data[8] if len(return_data) > 8 else None
+            logger.info(f"[Arm] Analisando byte de resultado (Byte 8): {hex(res_byte) if res_byte is not None else 'N/A'}")
+            
+            if res_byte == 0x91:
+                logger.info(f"[Arm] Particao {partition} armada com sucesso!")
                 return {"success": True, "result": "armed"}
+            
+            logger.warning(f"[Arm] Resposta inesperada da central para armar particao {partition}.")
             return {"success": False, "result": "not_armed"}
 
         return self._execute_with_connection(_arm)
 
     def disarm_partition(self, partition):
         """Disarm a specific partition (1-16). Use 0 for all partitions."""
+        logger.info(f"[Disarm] Iniciando comando para desarmar particao {partition}...")
 
         def _disarm():
             p = 0xFF if partition == 0 else partition
@@ -427,58 +443,119 @@ class AMT8000Client:
             arm_data = DST_ID + OUR_ID + length + COMMANDS["arm_disarm"] + [p, 0x00]
             cs = calculate_checksum(arm_data)
             payload = bytes(arm_data + [cs])
-            self._socket.send(payload)
+            logger.info(f"[Disarm] Enviando pacote de desarmar ({len(payload)} bytes): {payload.hex().upper()}")
+            try:
+                self._socket.send(payload)
+                logger.info("[Disarm] Pacote enviado. Aguardando resposta...")
+            except Exception as e:
+                logger.error(f"[Disarm] Erro ao enviar pacote: {e}")
+                raise
             return_data = self._read_data()
-            if return_data[8] == 0x91:
+            logger.info(f"[Disarm] Resposta recebida ({len(return_data)} bytes): {return_data.hex().upper()}")
+            
+            res_byte = return_data[8] if len(return_data) > 8 else None
+            logger.info(f"[Disarm] Analisando byte de resultado (Byte 8): {hex(res_byte) if res_byte is not None else 'N/A'}")
+            
+            if res_byte == 0x91:
+                logger.info(f"[Disarm] Particao {partition} desarmada com sucesso!")
                 return {"success": True, "result": "disarmed"}
+            
+            logger.warning(f"[Disarm] Resposta inesperada da central para desarmar particao {partition}.")
             return {"success": False, "result": "not_disarmed"}
 
         return self._execute_with_connection(_disarm)
 
     def bypass_zone(self, zone_number):
         """Bypass (anulate) a specific zone."""
+        logger.info(f"[Bypass] Iniciando bypass para a zona {zone_number}...")
 
         def _bypass():
             length = [0x00, 0x04]
             bypass_data = DST_ID + OUR_ID + length + COMMANDS["bypass"] + [zone_number, 0x01]
             cs = calculate_checksum(bypass_data)
             payload = bytes(bypass_data + [cs])
-            self._socket.send(payload)
+            logger.info(f"[Bypass] Enviando pacote de bypass ({len(payload)} bytes): {payload.hex().upper()}")
+            try:
+                self._socket.send(payload)
+                logger.info("[Bypass] Pacote enviado. Aguardando resposta...")
+            except Exception as e:
+                logger.error(f"[Bypass] Erro ao enviar pacote: {e}")
+                raise
             return_data = self._read_data()
-            if return_data[8] == 0x91 or return_data[7] == 0xFE:
+            logger.info(f"[Bypass] Resposta recebida ({len(return_data)} bytes): {return_data.hex().upper()}")
+            
+            cmd_byte = return_data[7] if len(return_data) > 7 else None
+            res_byte = return_data[8] if len(return_data) > 8 else None
+            logger.info(f"[Bypass] Analisando bytes de resposta - Byte 7 (CMD): {hex(cmd_byte) if cmd_byte is not None else 'N/A'}, Byte 8 (RES): {hex(res_byte) if res_byte is not None else 'N/A'}")
+            
+            if res_byte == 0x91 or cmd_byte == 0xFE:
+                logger.info(f"[Bypass] Zona {zone_number} anulada com sucesso!")
                 return {"success": True, "result": "bypassed"}
+                
+            logger.warning(f"[Bypass] Resposta inesperada da central para bypass da zona {zone_number}.")
             return {"success": False, "result": "not_bypassed"}
 
         return self._execute_with_connection(_bypass)
 
     def unbypass_zone(self, zone_number):
         """Remove bypass from a specific zone."""
+        logger.info(f"[Unbypass] Removendo bypass para a zona {zone_number}...")
 
         def _unbypass():
             length = [0x00, 0x04]
             bypass_data = DST_ID + OUR_ID + length + COMMANDS["bypass"] + [zone_number, 0x00]
             cs = calculate_checksum(bypass_data)
             payload = bytes(bypass_data + [cs])
-            self._socket.send(payload)
+            logger.info(f"[Unbypass] Enviando pacote de unbypass ({len(payload)} bytes): {payload.hex().upper()}")
+            try:
+                self._socket.send(payload)
+                logger.info("[Unbypass] Pacote enviado. Aguardando resposta...")
+            except Exception as e:
+                logger.error(f"[Unbypass] Erro ao enviar pacote: {e}")
+                raise
             return_data = self._read_data()
-            if return_data[8] == 0x91 or return_data[7] == 0xFE:
+            logger.info(f"[Unbypass] Resposta recebida ({len(return_data)} bytes): {return_data.hex().upper()}")
+            
+            cmd_byte = return_data[7] if len(return_data) > 7 else None
+            res_byte = return_data[8] if len(return_data) > 8 else None
+            logger.info(f"[Unbypass] Analisando bytes de resposta - Byte 7 (CMD): {hex(cmd_byte) if cmd_byte is not None else 'N/A'}, Byte 8 (RES): {hex(res_byte) if res_byte is not None else 'N/A'}")
+            
+            if res_byte == 0x91 or cmd_byte == 0xFE:
+                logger.info(f"[Unbypass] Bypass da zona {zone_number} removido com sucesso!")
                 return {"success": True, "result": "unbypass"}
+                
+            logger.warning(f"[Unbypass] Resposta inesperada da central para unbypass da zona {zone_number}.")
             return {"success": False, "result": "not_unbypass"}
 
         return self._execute_with_connection(_unbypass)
 
     def trigger_panic(self, panic_type=1):
         """Trigger panic alarm. Type 1 = audible, 2 = silent."""
+        logger.info(f"[Panic] Iniciando disparo de panico tipo {panic_type}...")
 
         def _panic():
             length = [0x00, 0x03]
             panic_data = DST_ID + OUR_ID + length + COMMANDS["panic"] + [panic_type]
             cs = calculate_checksum(panic_data)
             payload = bytes(panic_data + [cs])
-            self._socket.send(payload)
+            logger.info(f"[Panic] Enviando pacote de panico ({len(payload)} bytes): {payload.hex().upper()}")
+            try:
+                self._socket.send(payload)
+                logger.info("[Panic] Pacote enviado. Aguardando resposta...")
+            except Exception as e:
+                logger.error(f"[Panic] Erro ao enviar pacote: {e}")
+                raise
             return_data = self._read_data()
-            if return_data[7] == 0xFE:
+            logger.info(f"[Panic] Resposta recebida ({len(return_data)} bytes): {return_data.hex().upper()}")
+            
+            cmd_byte = return_data[7] if len(return_data) > 7 else None
+            logger.info(f"[Panic] Analisando byte de resposta - Byte 7: {hex(cmd_byte) if cmd_byte is not None else 'N/A'}")
+            
+            if cmd_byte == 0xFE:
+                logger.info("[Panic] Panico disparado com sucesso na central!")
                 return {"success": True, "result": "triggered"}
+                
+            logger.warning("[Panic] Resposta inesperada da central para disparo de panico.")
             return {"success": False, "result": "not_triggered"}
 
         return self._execute_with_connection(_panic)

@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.0.9] - 2026-05-25
+
+### Adicionado
+- Logs verbosos de diagnóstico detalhados para as operações de Armar, Desarmar, Pânico, Bypass (anulação) e Unbypass (reativação) de zonas, exibindo comandos enviados e respostas recebidas em formato hexadecimal.
+
+### Corrigido
+- Implementação de salvaguarda de limites de índice (proteção contra `IndexError`) em todas as respostas de comandos de rede da central de alarme, evitando falhas silenciosas do servidor caso a central responda com pacotes curtos ou malformados.
+
 ## [1.0.8] - 2026-05-25
 
 ### Corrigido
