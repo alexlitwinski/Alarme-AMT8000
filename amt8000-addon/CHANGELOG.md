@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.0.3] - 2026-05-25
+
+### Corrigido
+- Configuração de `init: false` no `config.yaml` para desativar o wrapper tini e permitir que o s6-overlay do contêiner execute como PID 1 sem conflitos.
+
 ## [1.0.2] - 2026-05-25
 
 ### Corrigido
