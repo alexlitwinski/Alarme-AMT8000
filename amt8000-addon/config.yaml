@@ -10,7 +10,7 @@ url: "https://github.com/your-repo/amt8000-addon"
 arch:
   - amd64
   - aarch64
-  - armv7
+  - armhf
 
 # Ingress configuration - embeds Web UI in Home Assistant sidebar
 ingress: true
@@ -49,4 +49,4 @@ environment:
   PYTHONUNBUFFERED: "1"
 
 # Labels
-image: "ghcr.io/your-repo/amt8000-addon-{arch}"
+
