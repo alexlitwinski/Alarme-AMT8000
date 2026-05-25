@@ -29,7 +29,7 @@ INGRESS_PATH = os.environ.get("INGRESS_PATH", "")
 # Create Flask app
 app = Flask(__name__, static_folder="static", template_folder="templates")
 
-VERSION = "1.2.1"
+VERSION = "1.2.3"
 
 # Create AMT-8000 client
 client = AMT8000Client(AMT_HOST, AMT_PORT, AMT_PASSWORD)
@@ -143,6 +143,11 @@ def api_arm_partition(partition_id):
     try:
         result = client.arm_partition(partition_id)
         logger.info(f"Arm partition {partition_id}: {result}")
+        if result.get("success"):
+            with cache_lock:
+                if status_cache["data"] and "partitions" in status_cache["data"]:
+                    if partition_id in status_cache["data"]["partitions"]:
+                        status_cache["data"]["partitions"][partition_id]["armed"] = True
         return jsonify(result)
     except Exception as e:
         logger.error(f"Error arming partition {partition_id}: {e}")
@@ -155,6 +160,11 @@ def api_disarm_partition(partition_id):
     try:
         result = client.disarm_partition(partition_id)
         logger.info(f"Disarm partition {partition_id}: {result}")
+        if result.get("success"):
+            with cache_lock:
+                if status_cache["data"] and "partitions" in status_cache["data"]:
+                    if partition_id in status_cache["data"]["partitions"]:
+                        status_cache["data"]["partitions"][partition_id]["armed"] = False
         return jsonify(result)
     except Exception as e:
         logger.error(f"Error disarming partition {partition_id}: {e}")
@@ -167,6 +177,11 @@ def api_arm_all():
     try:
         result = client.arm_partition(0)
         logger.info(f"Arm all partitions: {result}")
+        if result.get("success"):
+            with cache_lock:
+                if status_cache["data"] and "partitions" in status_cache["data"]:
+                    for pid in status_cache["data"]["partitions"]:
+                        status_cache["data"]["partitions"][pid]["armed"] = True
         return jsonify(result)
     except Exception as e:
         logger.error(f"Error arming all partitions: {e}")
@@ -179,6 +194,11 @@ def api_disarm_all():
     try:
         result = client.disarm_partition(0)
         logger.info(f"Disarm all partitions: {result}")
+        if result.get("success"):
+            with cache_lock:
+                if status_cache["data"] and "partitions" in status_cache["data"]:
+                    for pid in status_cache["data"]["partitions"]:
+                        status_cache["data"]["partitions"][pid]["armed"] = False
         return jsonify(result)
     except Exception as e:
         logger.error(f"Error disarming all partitions: {e}")
@@ -191,6 +211,11 @@ def api_bypass_zone(zone_id):
     try:
         result = client.bypass_zone(zone_id)
         logger.info(f"Bypass zone {zone_id}: {result}")
+        if result.get("success"):
+            with cache_lock:
+                if status_cache["data"] and "zones" in status_cache["data"]:
+                    if zone_id in status_cache["data"]["zones"]:
+                        status_cache["data"]["zones"][zone_id]["bypassed"] = True
         return jsonify(result)
     except Exception as e:
         logger.error(f"Error bypassing zone {zone_id}: {e}")
@@ -203,6 +228,11 @@ def api_unbypass_zone(zone_id):
     try:
         result = client.unbypass_zone(zone_id)
         logger.info(f"Unbypass zone {zone_id}: {result}")
+        if result.get("success"):
+            with cache_lock:
+                if status_cache["data"] and "zones" in status_cache["data"]:
+                    if zone_id in status_cache["data"]["zones"]:
+                        status_cache["data"]["zones"][zone_id]["bypassed"] = False
         return jsonify(result)
     except Exception as e:
         logger.error(f"Error unbypassing zone {zone_id}: {e}")

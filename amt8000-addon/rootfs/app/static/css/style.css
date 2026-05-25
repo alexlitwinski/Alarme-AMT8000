@@ -807,6 +807,7 @@ body::before {
 
 /* Toggle Switch for Bypass */
 .toggle-switch {
+    display: inline-block;
     position: relative;
     width: 44px;
     height: 24px;
@@ -822,7 +823,7 @@ body::before {
 .toggle-slider {
     position: absolute;
     inset: 0;
-    background: var(--bg-card);
+    background: rgba(255, 255, 255, 0.08);
     border: 1px solid var(--border-color);
     border-radius: 12px;
     transition: var(--transition-normal);

@@ -1,5 +1,19 @@
 # Changelog
 
+## [1.2.3] - 2026-05-25
+
+### Melhorado
+- Telemetria de sensores sem fio aprimorada com display mais rico e informativo:
+  - Bateria do sensor agora mostra estimativa percentual explícita: `Bat. OK (100%)` (quando a bateria está normal) e `Bat. Fraca (10%)` (quando em nível crítico/fraco).
+  - Sinal sem fio agora exibe rótulo intuitivo: `Sinal Forte` (em vez do genérico Sinal OK) e `Sem Sinal` (em vez de Sinal Ruim) baseado no estado de supervisão do sensor.
+
+## [1.2.2] - 2026-05-25
+
+### Corrigido
+- Ajuste de layout em `style.css` definindo `.toggle-switch` com `display: inline-block`, o que evita o colapso de dimensões do label de toggle na tela e corrige o bug visual que deslocava e cortava a chave de bypass para fora do limite das cartas de zonas.
+- Aumento da opacidade e refinamento estético do fundo da barra deslizante do bypass (`rgba(255,255,255,0.08)`) para visibilidade premium do switch.
+- Solução de condição de corrida (race condition) de atualização do estado da interface: agora os comandos de Armar, Desarmar, Bypass e Unbypass alteram instantaneamente o cache de status local em memória do servidor Flask. Isso elimina o comportamento jumpy (onde a chave ligava e voltava imediatamente para desligado até a próxima varredura de polling em background da central física).
+
 ## [1.2.1] - 2026-05-25
 
 ### Corrigido

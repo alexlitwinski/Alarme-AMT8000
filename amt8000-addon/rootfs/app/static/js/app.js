@@ -363,11 +363,11 @@ function renderZones(zones) {
                     <div class="zone-telemetry">
                         <span class="zone-telemetry-item" title="${z.tamper ? 'Problema de Sinal ou Sensor Violado/Tamper' : 'Sinal sem fio OK'}">
                             <i class="fa-solid fa-signal" style="color: ${z.tamper ? 'var(--color-danger)' : 'var(--color-armed)'};"></i>
-                            <span class="telemetry-text" style="color: ${z.tamper ? 'var(--color-danger)' : 'var(--text-secondary)'};">${z.tamper ? 'Sinal Ruim' : 'Sinal OK'}</span>
+                            <span class="telemetry-text" style="color: ${z.tamper ? 'var(--color-danger)' : 'var(--text-secondary)'};">${z.tamper ? 'Sem Sinal' : 'Sinal Forte'}</span>
                         </span>
                         <span class="zone-telemetry-item" title="${z.lowBattery ? 'Bateria Fraca - Substitua a bateria' : 'Bateria OK'}">
                             <i class="fa-solid ${z.lowBattery ? 'fa-battery-quarter' : 'fa-battery-full'}" style="color: ${z.lowBattery ? 'var(--color-danger)' : 'var(--color-armed)'}; ${z.lowBattery ? 'animation: pulse-danger 1.5s infinite;' : ''}"></i>
-                            <span class="telemetry-text" style="color: ${z.lowBattery ? 'var(--color-danger)' : 'var(--text-secondary)'};">${z.lowBattery ? 'Bat. Fraca' : 'Bat. OK'}</span>
+                            <span class="telemetry-text" style="color: ${z.lowBattery ? 'var(--color-danger)' : 'var(--text-secondary)'};">${z.lowBattery ? 'Bat. Fraca (10%)' : 'Bat. OK (100%)'}</span>
                         </span>
                     </div>
 
