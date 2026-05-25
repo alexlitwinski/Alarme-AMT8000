@@ -359,7 +359,19 @@ function renderZones(zones) {
                 
                 <div class="zone-info">
                     <div class="zone-name">Zona ${z.number.toString().padStart(2, '0')}</div>
-                    <div class="zone-status-badges">
+                    
+                    <div class="zone-telemetry">
+                        <span class="zone-telemetry-item" title="${z.tamper ? 'Problema de Sinal ou Sensor Violado/Tamper' : 'Sinal sem fio OK'}">
+                            <i class="fa-solid fa-signal" style="color: ${z.tamper ? 'var(--color-danger)' : 'var(--color-armed)'};"></i>
+                            <span class="telemetry-text" style="color: ${z.tamper ? 'var(--color-danger)' : 'var(--text-secondary)'};">${z.tamper ? 'Sinal Ruim' : 'Sinal OK'}</span>
+                        </span>
+                        <span class="zone-telemetry-item" title="${z.lowBattery ? 'Bateria Fraca - Substitua a bateria' : 'Bateria OK'}">
+                            <i class="fa-solid ${z.lowBattery ? 'fa-battery-quarter' : 'fa-battery-full'}" style="color: ${z.lowBattery ? 'var(--color-danger)' : 'var(--color-armed)'}; ${z.lowBattery ? 'animation: pulse-danger 1.5s infinite;' : ''}"></i>
+                            <span class="telemetry-text" style="color: ${z.lowBattery ? 'var(--color-danger)' : 'var(--text-secondary)'};">${z.lowBattery ? 'Bat. Fraca' : 'Bat. OK'}</span>
+                        </span>
+                    </div>
+
+                    <div class="zone-status-badges" style="margin-top: 6px;">
                         ${z.open ? '<span class="zone-badge open">Aberta</span>' : '<span class="zone-badge closed">Fechada</span>'}
                         ${z.violated ? '<span class="zone-badge violated">Violada</span>' : ''}
                         ${z.bypassed ? '<span class="zone-badge bypassed">Anulada</span>' : ''}

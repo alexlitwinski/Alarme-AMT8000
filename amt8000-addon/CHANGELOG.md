@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.2.0] - 2026-05-25
+
+### Adicionado
+- Telemetria de bateria e sinal sem fio para sensores sem fio (zonas) no painel web, implementando um display premium de ícones e badges dinâmicas baseadas nos bits de `lowBattery` (bateria do sensor) e `tamper` (que sinaliza integridade/perda de supervisão do sensor).
+
 ## [1.1.0] - 2026-05-25
 
 ### Corrigido

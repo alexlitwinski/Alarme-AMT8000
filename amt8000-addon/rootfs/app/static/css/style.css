@@ -765,6 +765,42 @@ body::before {
     color: var(--color-warning);
 }
 
+/* Zone Telemetry Details */
+.zone-telemetry {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    margin-top: 4px;
+    margin-bottom: 6px;
+}
+
+.zone-telemetry-item {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    background: rgba(15, 23, 42, 0.45);
+    padding: 2px 8px;
+    border-radius: 6px;
+    border: 1px solid var(--border-color);
+    transition: var(--transition-fast);
+    cursor: default;
+}
+
+.zone-telemetry-item:hover {
+    background: rgba(20, 30, 55, 0.6);
+    border-color: var(--border-glow);
+}
+
+.zone-telemetry-item i {
+    font-size: 0.7rem;
+}
+
+.zone-telemetry-item .telemetry-text {
+    font-size: 0.68rem;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+}
+
 .zone-actions {
     flex-shrink: 0;
 }
