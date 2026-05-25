@@ -1,5 +1,11 @@
 # Changelog
 
+## [1.0.1] - 2026-05-25
+
+### Corrigido
+- Remoção da chave de download de imagem `image` para forçar a compilação local a partir do Dockerfile.
+- Correção da arquitetura depreciada `armv7` para `armhf` no arquivo de configuração do add-on.
+
 ## [1.0.0] - 2026-05-25
 
 ### Adicionado
