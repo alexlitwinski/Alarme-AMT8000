@@ -47,7 +47,7 @@ logger.info(f"Custom Partition Names Configured: {len(CUSTOM_PARTITIONS)}")
 # Create Flask app
 app = Flask(__name__, static_folder="static", template_folder="templates")
 
-VERSION = "1.3.0"
+VERSION = "1.3.1"
 
 # Create AMT-8000 client
 client = AMT8000Client(AMT_HOST, AMT_PORT, AMT_PASSWORD)

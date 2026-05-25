@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.3.1] - 2026-05-25
+
+### Corrigido
+- Remoção do caractere `?` das chaves de schema de `zones` e `partitions` no `config.yaml`. Isso resolve o erro de validação do Home Assistant Supervisor (`Missing option 'zones?' in root`), que tentava ler o caractere do sufixo como parte literal do nome da propriedade em vez de uma marcação opcional.
+
 ## [1.3.0] - 2026-05-25
 
 ### Adicionado
