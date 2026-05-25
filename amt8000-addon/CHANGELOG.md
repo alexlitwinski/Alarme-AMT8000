@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.0.4] - 2026-05-25
+
+### Corrigido
+- Ativação de `host_network: true` no `config.yaml` para permitir que o add-on acesse diretamente a rede local (LAN) do host, evitando timeouts causados por isolamento de rede do Docker bridge.
+
 ## [1.0.3] - 2026-05-25
 
 ### Corrigido
