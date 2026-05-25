@@ -227,8 +227,12 @@ class AMT8000Client:
             raise CommunicationError(f"Failed to read message header. Read only {len(header)} bytes.")
 
         expected_len = struct.unpack("!H", header[4:6])[0]
-        total_len = 8 + expected_len
-        logger.info(f"[Socket] Tamanho do payload esperado: {expected_len} bytes. Total do pacote: {total_len} bytes.")
+        # O cabecalho lido tem 6 bytes (DST_ID: 2 + OUR_ID: 2 + LENGTH: 2).
+        # O campo LENGTH (expected_len) inclui o comando (2 bytes) e os dados do payload.
+        # Resta ler: expected_len (comando + payload) + 1 byte de checksum.
+        # Portanto, o tamanho total real do pacote e 6 + expected_len + 1 = 7 + expected_len.
+        total_len = 7 + expected_len
+        logger.info(f"[Socket] Tamanho do payload esperado: {expected_len} bytes. Total do pacote real: {total_len} bytes.")
 
         buffer = bytearray(header)
 

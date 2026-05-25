@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.0.8] - 2026-05-25
+
+### Corrigido
+- Correção de bug crítico de cálculo off-by-one no tamanho total do pacote de dados (`_read_data`), mudando de `8 + expected_len` para `7 + expected_len` bytes. Isso resolve de forma definitiva o problema de timeout infinito gerado pela leitura de um byte extra inexistente após o checksum.
+
 ## [1.0.7] - 2026-05-25
 
 ### Adicionado
