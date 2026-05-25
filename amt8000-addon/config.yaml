@@ -2,7 +2,7 @@
 # https://github.com/your-repo/amt8000-addon
 
 name: "AMT-8000 Alarm Manager"
-version: "1.0.5"
+version: "1.0.6"
 slug: "amt8000_alarm_manager"
 description: "Gerencie sua central de alarme Intelbras AMT-8000 com uma interface moderna e intuitiva. Monitore zonas, partições, bateria e muito mais."
 url: "https://github.com/your-repo/amt8000-addon"
@@ -36,6 +36,7 @@ startup: "application"
 boot: "auto"
 init: false
 host_network: true
+apparmor: false
 
 # System access
 homeassistant_api: false

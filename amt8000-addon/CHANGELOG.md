@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.0.6] - 2026-05-25
+
+### Corrigido
+- Desativação do perfil AppArmor (`apparmor: false`) no `config.yaml` para remover as restrições de segurança do contêiner sobre soquetes TCP de rede, permitindo conectividade irrestrita com a rede física local.
+
 ## [1.0.5] - 2026-05-25
 
 ### Corrigido
