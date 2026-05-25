@@ -6,6 +6,7 @@ RUN pip3 install --no-cache-dir flask==3.1.1
 
 # Copy application files
 COPY rootfs /
+COPY run.sh /
 
 # Make run script executable
 RUN chmod a+x /run.sh

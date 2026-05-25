@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.0.2] - 2026-05-25
+
+### Corrigido
+- Inclusão da cópia explícita do script `run.sh` no Dockerfile para corrigir falha de compilação da imagem Docker.
+
 ## [1.0.1] - 2026-05-25
 
 ### Corrigido
