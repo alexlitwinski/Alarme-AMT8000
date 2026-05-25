@@ -1,0 +1,52 @@
+# Home Assistant Add-on: AMT-8000 Alarm Manager
+# https://github.com/your-repo/amt8000-addon
+
+name: "AMT-8000 Alarm Manager"
+version: "1.0.0"
+slug: "amt8000_alarm_manager"
+description: "Gerencie sua central de alarme Intelbras AMT-8000 com uma interface moderna e intuitiva. Monitore zonas, partições, bateria e muito mais."
+url: "https://github.com/your-repo/amt8000-addon"
+
+arch:
+  - amd64
+  - aarch64
+  - armv7
+
+# Ingress configuration - embeds Web UI in Home Assistant sidebar
+ingress: true
+ingress_port: 8099
+panel_icon: "mdi:shield-home"
+panel_title: "AMT-8000"
+
+# Add-on options (user configurable)
+options:
+  host: ""
+  port: 9009
+  password: ""
+  update_interval: 4
+
+schema:
+  host: str
+  port: port
+  password: password
+  update_interval: "int(1,300)"
+
+# Startup configuration
+startup: "application"
+boot: "auto"
+
+# System access
+homeassistant_api: false
+hassio_api: false
+
+# Map persistent data
+map:
+  - type: data
+    read_only: false
+
+# Environment
+environment:
+  PYTHONUNBUFFERED: "1"
+
+# Labels
+image: "ghcr.io/your-repo/amt8000-addon-{arch}"

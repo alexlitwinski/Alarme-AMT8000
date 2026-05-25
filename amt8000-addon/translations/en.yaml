@@ -1,0 +1,13 @@
+configuration:
+  host:
+    name: "IP Address (Host)"
+    description: "The IP address or hostname of your Intelbras AMT-8000 alarm panel."
+  port:
+    name: "Port"
+    description: "The TCP port for connection (default panel port: 9009)."
+  password:
+    name: "Alarm Panel Password"
+    description: "The 6-digit numeric user password configured on the alarm panel."
+  update_interval:
+    name: "Update Interval (seconds)"
+    description: "How often the addon requests status updates from the alarm panel (default: 4 seconds)."

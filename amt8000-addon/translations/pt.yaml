@@ -1,0 +1,13 @@
+configuration:
+  host:
+    name: "Endereço IP (Host)"
+    description: "O endereço IP ou hostname da sua central de alarme Intelbras AMT-8000."
+  port:
+    name: "Porta"
+    description: "A porta TCP para conexão (padrão da central: 9009)."
+  password:
+    name: "Senha da Central"
+    description: "A senha numérica de 6 dígitos do usuário configurada na central de alarme."
+  update_interval:
+    name: "Intervalo de Atualização (segundos)"
+    description: "Frequência de consulta de status da central de alarme pelo addon (padrão: 4 segundos)."

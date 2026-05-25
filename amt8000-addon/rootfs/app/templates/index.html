@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="ingress-path" content="{{ ingress_path }}">
+    <title>AMT-8000 Alarm Manager</title>
+    
+    <!-- Link to premium stylesheet -->
+    <link rel="stylesheet" href="{{ ingress_path }}/static/css/style.css">
+    
+    <!-- Font Awesome for modern icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <div class="header-left">
+                <div class="header-icon">
+                    <i class="fa-solid fa-shield-halved" style="color: #fff;"></i>
+                </div>
+                <div>
+                    <h1 class="header-title">Intelbras AMT-8000</h1>
+                    <span class="header-subtitle">Gerenciador de Alarme</span>
+                </div>
+            </div>
+            <div class="header-right">
+                <div id="firmware-badge" class="firmware-badge">V --</div>
+                <div id="connection-badge" class="connection-badge offline">
+                    <span id="connection-dot" class="connection-dot offline"></span>
+                    <span id="connection-text">Desconectado</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        
+        <!-- Loading Overlay -->
+        <div id="loading-overlay" class="loading-overlay">
+            <div class="loading-spinner"></div>
+            <div class="loading-text">Conectando à central AMT-8000...</div>
+        </div>
+
+        <!-- Error Container -->
+        <div id="error-container" class="error-container" style="display: none;">
+            <div class="error-icon">
+                <i class="fa-solid fa-triangle-exclamation" style="color: var(--color-danger);"></i>
+            </div>
+            <h2 class="error-title">Falha na Conexão</h2>
+            <p id="error-message" class="error-message">Não foi possível estabelecer comunicação com a central de alarme.</p>
+            <button id="btn-retry" class="btn btn-ghost" style="max-width: 200px; margin-top: var(--spacing-md);">
+                <i class="fa-solid fa-arrows-rotate"></i> Tentar Novamente
+            </button>
+        </div>
+
+        <!-- Dashboard UI (Initially hidden until first data load) -->
+        <div id="dashboard-ui" style="display: none;">
+            
+            <!-- Quick Actions -->
+            <section class="quick-actions">
+                <button class="quick-action-btn arm" onclick="confirmGlobalAction('arm_all')">
+                    <div class="action-icon">
+                        <i class="fa-solid fa-lock"></i>
+                    </div>
+                    <div class="action-text">
+                        <div class="action-title">Armar Tudo</div>
+                        <div class="action-desc">Arma todas as partições ativas</div>
+                    </div>
+                </button>
+                
+                <button class="quick-action-btn disarm" onclick="confirmGlobalAction('disarm_all')">
+                    <div class="action-icon">
+                        <i class="fa-solid fa-lock-open"></i>
+                    </div>
+                    <div class="action-text">
+                        <div class="action-title">Desarmar Tudo</div>
+                        <div class="action-desc">Desarma todas as partições</div>
+                    </div>
+                </button>
+                
+                <button class="quick-action-btn panic" onclick="triggerPanicPrompt()">
+                    <div class="action-icon">
+                        <i class="fa-solid fa-bell"></i>
+                    </div>
+                    <div class="action-text">
+                        <div class="action-title">Pânico / Alerta</div>
+                        <div class="action-desc">Dispara alerta sonoro ou silencioso</div>
+                    </div>
+                </button>
+            </section>
+
+            <!-- Overview Grid -->
+            <section class="overview-grid">
+                <div class="overview-card status-info" id="card-system-status">
+                    <span class="card-icon"><i class="fa-solid fa-circle-info" style="color: var(--color-info);"></i></span>
+                    <div id="val-system-status" class="card-value">--</div>
+                    <div class="card-label">Estado Geral</div>
+                </div>
+                
+                <div class="overview-card status-info" id="card-armed-partitions">
+                    <span class="card-icon"><i class="fa-solid fa-circle-check" style="color: var(--color-armed);"></i></span>
+                    <div id="val-armed-partitions" class="card-value">0</div>
+                    <div class="card-label">Partições Armadas</div>
+                </div>
+                
+                <div class="overview-card status-info" id="card-violated-zones">
+                    <span class="card-icon"><i class="fa-solid fa-door-open" style="color: var(--color-danger);"></i></span>
+                    <div id="val-violated-zones" class="card-value">0</div>
+                    <div class="card-label">Zonas Abertas</div>
+                </div>
+                
+                <div class="overview-card status-info" id="card-bypassed-zones">
+                    <span class="card-icon"><i class="fa-solid fa-eye-slash" style="color: var(--color-bypassed);"></i></span>
+                    <div id="val-bypassed-zones" class="card-value">0</div>
+                    <div class="card-label">Zonas Anuladas (Bypass)</div>
+                </div>
+            </section>
+
+            <!-- Partitions Section -->
+            <section class="partitions-section">
+                <h2 class="section-title">
+                    <i class="fa-solid fa-layer-group icon"></i> Partições
+                    <span id="partitions-count" class="count-badge">0</span>
+                </h2>
+                <div id="partitions-grid" class="partitions-grid">
+                    <!-- Dynamic Partition Cards -->
+                </div>
+            </section>
+
+            <!-- Zones Section -->
+            <section class="zones-section">
+                <h2 class="section-title">
+                    <i class="fa-solid fa-border-all icon"></i> Zonas
+                    <span id="zones-count" class="count-badge">0</span>
+                </h2>
+                
+                <!-- Zones Toolbar -->
+                <div class="zones-toolbar">
+                    <input type="text" id="zone-search" class="search-input" placeholder="Pesquisar por zona (ex: Sala, Zona 05)..." oninput="filterZones()">
+                    
+                    <div class="filter-group">
+                        <button class="filter-btn active" data-filter="all" onclick="setZoneFilter('all')">Todas</button>
+                        <button class="filter-btn" data-filter="open" onclick="setZoneFilter('open')">Abertas</button>
+                        <button class="filter-btn" data-filter="bypassed" onclick="setZoneFilter('bypassed')">Anuladas</button>
+                        <button class="filter-btn" data-filter="closed" onclick="setZoneFilter('closed')">Fechadas</button>
+                    </div>
+                </div>
+
+                <div id="zones-grid" class="zones-grid">
+                    <!-- Dynamic Zone Cards -->
+                </div>
+            </section>
+
+            <!-- System Info Section -->
+            <section class="system-section">
+                <h2 class="section-title">
+                    <i class="fa-solid fa-microchip icon"></i> Diagnóstico da Central
+                </h2>
+                <div class="system-grid">
+                    <div class="system-item">
+                        <div class="system-item-icon">
+                            <i class="fa-solid fa-server" style="color: var(--text-secondary);"></i>
+                        </div>
+                        <div class="system-item-info">
+                            <div class="label">Endereço IP</div>
+                            <div id="sys-ip" class="value">--</div>
+                        </div>
+                    </div>
+
+                    <div class="system-item">
+                        <div class="system-item-icon">
+                            <i class="fa-solid fa-signal" style="color: var(--text-secondary);"></i>
+                        </div>
+                        <div class="system-item-info">
+                            <div class="label">Porta</div>
+                            <div id="sys-port" class="value">--</div>
+                        </div>
+                    </div>
+
+                    <div class="system-item">
+                        <div class="system-item-icon">
+                            <i class="fa-solid fa-battery-half" style="color: var(--text-secondary);"></i>
+                        </div>
+                        <div class="system-item-info">
+                            <div class="label">Bateria Central</div>
+                            <div id="sys-battery" class="value">--</div>
+                        </div>
+                    </div>
+
+                    <div class="system-item">
+                        <div class="system-item-icon">
+                            <i class="fa-solid fa-clock" style="color: var(--text-secondary);"></i>
+                        </div>
+                        <div class="system-item-info">
+                            <div class="label">Última Atualização</div>
+                            <div id="sys-update" class="value">--</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </div>
+    </main>
+
+    <!-- Toast Notifications -->
+    <div id="toast-container" class="toast-container"></div>
+
+    <!-- Confirmation Modal -->
+    <div id="modal-overlay" class="modal-overlay hidden">
+        <div class="modal-content">
+            <h3 id="modal-title" class="modal-title">Confirmar Ação</h3>
+            <p id="modal-message" class="modal-message">Você tem certeza que deseja executar esta ação?</p>
+            <div class="modal-actions">
+                <button id="modal-cancel-btn" class="btn btn-ghost btn-sm" onclick="closeModal()">Cancelar</button>
+                <button id="modal-confirm-btn" class="btn btn-arm btn-sm">Confirmar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- App Script -->
+    <script src="{{ ingress_path }}/static/js/app.js"></script>
+</body>
+</html>
