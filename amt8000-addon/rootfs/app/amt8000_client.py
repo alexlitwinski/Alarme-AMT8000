@@ -488,7 +488,7 @@ class AMT8000Client:
             res_byte = return_data[8] if len(return_data) > 8 else None
             logger.info(f"[Bypass] Analisando bytes de resposta - Byte 7 (CMD): {hex(cmd_byte) if cmd_byte is not None else 'N/A'}, Byte 8 (RES): {hex(res_byte) if res_byte is not None else 'N/A'}")
             
-            if res_byte == 0x91 or cmd_byte == 0xFE:
+            if res_byte == 0xFE or res_byte == 0x91 or cmd_byte == 0xFE:
                 logger.info(f"[Bypass] Zona {zone_number} anulada com sucesso!")
                 return {"success": True, "result": "bypassed"}
                 
@@ -520,7 +520,7 @@ class AMT8000Client:
             res_byte = return_data[8] if len(return_data) > 8 else None
             logger.info(f"[Unbypass] Analisando bytes de resposta - Byte 7 (CMD): {hex(cmd_byte) if cmd_byte is not None else 'N/A'}, Byte 8 (RES): {hex(res_byte) if res_byte is not None else 'N/A'}")
             
-            if res_byte == 0x91 or cmd_byte == 0xFE:
+            if res_byte == 0xFE or res_byte == 0x91 or cmd_byte == 0xFE:
                 logger.info(f"[Unbypass] Bypass da zona {zone_number} removido com sucesso!")
                 return {"success": True, "result": "unbypass"}
                 

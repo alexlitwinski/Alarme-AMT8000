@@ -1,5 +1,10 @@
 # Changelog
 
+## [1.1.0] - 2026-05-25
+
+### Corrigido
+- Ajuste e correção do critério de sucesso do comando de Bypass (anulação) e Unbypass (reativação) de zonas, adicionando suporte à validação do byte de resultado `0xFE` no índice 8 (`res_byte == 0xFE`), que é o retorno real de sucesso emitido pela central AMT-8000 para estas operações.
+
 ## [1.0.9] - 2026-05-25
 
 ### Adicionado
